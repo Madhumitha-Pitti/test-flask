@@ -4,7 +4,7 @@
 # https://docs.microsoft.com/azure/devops/pipelines/apps/windows/dot-net
 
 trigger:
-- main
+- master
 
 pool:
   vmImage: 'windows-latest'
@@ -25,11 +25,19 @@ steps:
   inputs:
     solution: '$(solution)'
     msbuildArgs: '/p:OutputPath="$(Bulid.BinariesDirectory)\$(Bulid.BulidId)"'
+    platform: '$(bulidPlatform)'
+    configuration: '$(bulidConfiguration)'
+
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: '$(Build.BinariesDirectory)\(Bulid.BulidId)'
+    includeRootFolder: false
+    archiveType: 'zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+    replaceExistingArchive: true
+
 - task: PublishBuildArtifacts@1
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: 'drop'
     publishLocation: 'Container'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-
